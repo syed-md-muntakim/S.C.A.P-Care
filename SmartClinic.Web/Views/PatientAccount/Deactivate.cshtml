@@ -1,0 +1,21 @@
+@model DeactivateAccountViewModel
+@{ ViewData["Title"] = "Deactivate Account"; }
+<div class="container py-4" style="max-width:520px">
+    <a asp-action="Index" class="link-clinic small"><i class="bi bi-arrow-left"></i> Back to My Account</a>
+    <h3 class="mt-2 mb-3 text-danger">Deactivate account</h3>
+    <div class="alert alert-warning">You will be signed out immediately and will not be able to log in until a clinic administrator reactivates your account. Your medical data is kept.</div>
+    <form asp-action="Deactivate" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2"></div>
+        <div class="card mb-3"><div class="card-body">
+            <div class="mb-3"><label asp-for="Password" class="form-label"></label><input asp-for="Password" class="form-control" autocomplete="current-password" /><span asp-validation-for="Password" class="text-danger small"></span></div>
+            <div class="form-check">
+                <input asp-for="Confirm" class="form-check-input" />
+                <label asp-for="Confirm" class="form-check-label">I understand and want to deactivate my account.</label>
+                <div><span asp-validation-for="Confirm" class="text-danger small"></span></div>
+            </div>
+        </div></div>
+        <button type="submit" class="btn btn-danger">Deactivate my account</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

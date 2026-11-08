@@ -1,0 +1,37 @@
+@model IReadOnlyList<PatientListItem>
+@{ ViewData["Title"] = "Patients"; }
+@section Styles { <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.min.css" /> }
+<div class="container py-4">
+    <h3 class="mb-1">Patient accounts</h3>
+    <p class="text-muted">Search, review and activate/deactivate patient accounts.</p>
+    <div class="card"><div class="card-body">
+        <table id="patientsTable" class="table align-middle w-100">
+            <thead><tr><th>Patient ID</th><th>Name</th><th>User ID</th><th>Contact</th><th>Registered</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td>@p.PatientCode</td>
+                    <td>@p.FullName</td>
+                    <td>@p.UserName</td>
+                    <td>@p.Email<br /><span class="small text-muted">@p.Phone</span></td>
+                    <td data-order="@p.RegisteredAt.ToString("yyyyMMdd")">@p.RegisteredAt.ToString("dd MMM yyyy")</td>
+                    <td>@if (p.IsActive) { <span class="badge text-bg-success">Active</span> } else { <span class="badge text-bg-secondary">Deactivated</span> }</td>
+                    <td class="text-nowrap">
+                        <a asp-action="Details" asp-route-id="@p.UserId" class="btn btn-sm btn-outline-clinic">View</a>
+                        <form asp-action="SetActive" asp-route-id="@p.UserId" asp-route-active="@(!p.IsActive)" method="post" class="d-inline"
+                              onsubmit="return confirm('@(p.IsActive ? "Deactivate" : "Activate") this patient account?');">
+                            <button class="btn btn-sm @(p.IsActive ? "btn-outline-danger" : "btn-outline-success")">@(p.IsActive ? "Deactivate" : "Activate")</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div></div>
+</div>
+@section Scripts {
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.min.js"></script>
+    <script>new DataTable('#patientsTable', { order: [[1, 'asc']], pageLength: 10, columnDefs: [{ orderable: false, targets: -1 }] });</script>
+}

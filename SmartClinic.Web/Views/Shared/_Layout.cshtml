@@ -25,12 +25,15 @@
                 {
                     var dash = User.IsInRole(Roles.Admin) ? "Admin" : User.IsInRole(Roles.Doctor) ? "Doctor" : "Patient";
                     <a class="btn btn-header" asp-controller="@dash" asp-action="Dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a>
+<<<<<<< HEAD
                     @if (User.IsInRole(Roles.Admin))
                     {
                         <a class="btn btn-header" asp-controller="MedicineInventory" asp-action="Index">
                             <i class="bi bi-capsule"></i> Inventory
                         </a>
                     }
+=======
+>>>>>>> foundation
                     <span class="header-user d-none d-md-inline"><i class="bi bi-person-circle"></i> @User.Identity.Name (@dash)</span>
                 }
                 else

@@ -1,0 +1,28 @@
+@model LeaveFormViewModel
+@{ ViewData["Title"] = "Add Leave"; }
+<div class="container py-4" style="max-width:720px">
+    <a asp-action="Index" asp-route-doctorId="@Model.DoctorId" class="link-clinic small"><i class="bi bi-arrow-left"></i> Back to schedule</a>
+    <h3 class="mt-2 mb-1">Add leave</h3>
+    <p class="text-muted">@Model.DoctorName &middot; no slots are offered on leave days.</p>
+
+    <form asp-action="AddLeave" method="post">
+        <div asp-validation-summary="All" class="alert alert-danger py-2"></div>
+        <input type="hidden" name="DoctorId" value="@Model.DoctorId" />
+        <div class="card mb-3"><div class="card-body"><div class="row g-3">
+            <div class="col-md-6"><label class="form-label">From</label><input type="date" name="StartDate" class="form-control" value="@Model.StartDate.Iso()" min="@ClinicTime.Today.Iso()" required /></div>
+            <div class="col-md-6"><label class="form-label">To</label><input type="date" name="EndDate" class="form-control" value="@Model.EndDate.Iso()" min="@ClinicTime.Today.Iso()" required /></div>
+            <div class="col-md-6">
+                <label class="form-label">Leave type</label>
+                <select name="LeaveType" class="form-select">
+                    @foreach (var t in Enum.GetValues<LeaveType>())
+                    {
+                        <option value="@t" selected="@(t == Model.LeaveType)">@t</option>
+                    }
+                </select>
+            </div>
+            <div class="col-12"><label class="form-label">Reason <span class="text-muted">(optional)</span></label><input type="text" name="Reason" maxlength="200" class="form-control" value="@Model.Reason" /></div>
+        </div></div></div>
+        <button type="submit" class="btn btn-clinic">Save leave</button>
+        <a asp-action="Index" asp-route-doctorId="@Model.DoctorId" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+</div>

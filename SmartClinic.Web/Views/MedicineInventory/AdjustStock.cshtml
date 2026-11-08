@@ -1,0 +1,63 @@
+@model MedicineStockAdjustmentViewModel
+@{
+    ViewData["Title"] = "Adjust Medicine Stock";
+}
+
+<div class="container py-4">
+    <div class="mb-4">
+        <a asp-action="Details" asp-route-id="@Model.MedicineId" class="link-clinic text-decoration-none">
+            <i class="bi bi-arrow-left me-1"></i> Back to medicine
+        </a>
+        <h3 class="mt-2 mb-1">Adjust stock</h3>
+        <p class="text-muted mb-0">@Model.MedicineName</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card">
+                <div class="card-body p-4">
+                    <div class="stat-card mb-4">
+                        <div class="stat-value">@Model.CurrentQuantity</div>
+                        <div class="stat-label">Current quantity in stock</div>
+                    </div>
+
+                    <form asp-action="AdjustStock" method="post">
+                        <input asp-for="MedicineId" type="hidden" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="MovementType" class="form-label"></label>
+                            <select asp-for="MovementType" class="form-select">
+                                <option value="@StockMovementType.StockIn">Stock in (receive / restock)</option>
+                                <option value="@StockMovementType.StockOut">Stock out (dispense / remove)</option>
+                            </select>
+                            <span asp-validation-for="MovementType" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Quantity" class="form-label"></label>
+                            <input asp-for="Quantity" type="number" min="1" class="form-control" />
+                            <span asp-validation-for="Quantity" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label"></label>
+                            <textarea asp-for="Notes" class="form-control" rows="3"
+                                      placeholder="Optional reason, supplier delivery reference, etc."></textarea>
+                            <span asp-validation-for="Notes" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a asp-action="Details" asp-route-id="@Model.MedicineId" class="btn btn-outline-clinic">Cancel</a>
+                            <button type="submit" class="btn btn-clinic">
+                                <i class="bi bi-check-lg me-1"></i> Save stock movement
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

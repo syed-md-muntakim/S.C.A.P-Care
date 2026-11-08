@@ -1,0 +1,88 @@
+@model DoctorSearchResult
+@{ ViewData["Title"] = "Find a Doctor"; }
+@section Styles { <link rel="stylesheet" href="~/css/doctors.css" asp-append-version="true" /> }
+
+<div class="container py-4">
+    <h3 class="mb-1">Find a Doctor</h3>
+    <p class="text-muted">Search by name or specialty and filter to find the right doctor.</p>
+
+    <form asp-action="Index" method="get" class="filter-bar mb-4" id="filterForm">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small mb-1">Search</label>
+                <input name="Keyword" value="@Model.Query.Keyword" class="form-control" placeholder="Doctor name, user ID or specialty" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small mb-1">Specialty</label>
+                <select name="Specialty" class="form-select auto-submit">
+                    <option value="">All specialties</option>
+                    @foreach (var s in Model.Specialties)
+                    {
+                        <option value="@s" selected="@(s == Model.Query.Specialty)">@s</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small mb-1">Sort by</label>
+                <select name="Sort" class="form-select auto-submit">
+                    <option value="name" selected="@(Model.Query.Sort is null or "name")">Name (A–Z)</option>
+                    <option value="name_desc" selected="@(Model.Query.Sort == "name_desc")">Name (Z–A)</option>
+                    <option value="newest" selected="@(Model.Query.Sort == "newest")">Newest</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-clinic flex-fill"><i class="bi bi-search"></i> Search</button>
+                <a asp-action="Index" class="btn btn-outline-clinic flex-fill">Reset</a>
+            </div>
+        </div>
+    </form>
+
+    <p class="small text-muted mb-3">@Model.TotalCount doctor(s) found</p>
+
+    @if (!Model.Items.Any())
+    {
+        <div class="text-center text-muted py-5"><i class="bi bi-search" style="font-size:2.5rem"></i><p class="mt-2">No doctors match your search.</p></div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var d in Model.Items)
+            {
+                <div class="col-sm-6 col-lg-4">
+                    <div class="doctor-card">
+                        <div class="doctor-avatar">@d.Initials</div>
+                        <h5 class="mb-1">@d.DisplayName</h5>
+                        <span class="badge badge-specialty mb-3">@(d.Specialty ?? "General")</span>
+                        <div><a asp-action="Details" asp-route-id="@d.Id" class="btn btn-sm btn-clinic">View profile</a></div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <nav class="mt-4"><ul class="pagination justify-content-center">
+                <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-Keyword="@Model.Query.Keyword" asp-route-Specialty="@Model.Query.Specialty" asp-route-Sort="@Model.Query.Sort" asp-route-Page="@(Model.Page - 1)">Previous</a>
+                </li>
+                @for (var p = 1; p <= Model.TotalPages; p++)
+                {
+                    <li class="page-item @(p == Model.Page ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-Keyword="@Model.Query.Keyword" asp-route-Specialty="@Model.Query.Specialty" asp-route-Sort="@Model.Query.Sort" asp-route-Page="@p">@p</a>
+                    </li>
+                }
+                <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-Keyword="@Model.Query.Keyword" asp-route-Specialty="@Model.Query.Specialty" asp-route-Sort="@Model.Query.Sort" asp-route-Page="@(Model.Page + 1)">Next</a>
+                </li>
+            </ul></nav>
+        }
+    }
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.auto-submit').forEach(function (el) {
+            el.addEventListener('change', function () { document.getElementById('filterForm').submit(); });
+        });
+    </script>
+}

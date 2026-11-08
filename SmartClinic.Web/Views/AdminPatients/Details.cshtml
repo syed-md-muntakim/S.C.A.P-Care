@@ -1,0 +1,35 @@
+@model PatientAccountViewModel
+@{ ViewData["Title"] = "Patient Details"; }
+<div class="container py-4" style="max-width:900px">
+    <a asp-action="Index" class="link-clinic small"><i class="bi bi-arrow-left"></i> Back to patients</a>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-1 mb-3">
+        <div>
+            <h3 class="mb-0">@Model.FullName</h3>
+            <span class="text-muted">@Model.PatientCode &middot; @Model.UserName &middot;
+                @if (Model.IsActive) { <span class="badge text-bg-success">Active</span> } else { <span class="badge text-bg-secondary">Deactivated</span> }
+            </span>
+        </div>
+        <form asp-action="SetActive" asp-route-id="@Model.UserId" asp-route-active="@(!Model.IsActive)" asp-route-returnTo="details" method="post">
+            <button class="btn @(Model.IsActive ? "btn-outline-danger" : "btn-clinic")">@(Model.IsActive ? "Deactivate account" : "Activate account")</button>
+        </form>
+    </div>
+    <div class="row g-3">
+        <div class="col-md-6"><div class="card h-100"><div class="card-header fw-semibold">Personal &amp; contact</div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Email</span><span>@Model.Email</span></li>
+                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Phone</span><span>@Model.PhoneNumber</span></li>
+                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Date of birth</span><span>@(Model.DateOfBirth is { } d ? d.Pretty() + " (" + Model.Age + " yrs)" : "—")</span></li>
+                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Gender</span><span>@(Model.Gender ?? "—")</span></li>
+                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Address</span><span class="text-end">@(Model.Address ?? "—")</span></li>
+                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Member since</span><span>@Model.MemberSince.ToString("dd MMM yyyy")</span></li>
+            </ul></div></div>
+        <div class="col-md-6"><div class="card h-100"><div class="card-header fw-semibold">Medical &amp; emergency</div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Blood group</span><span>@(Model.BloodGroup ?? "—")</span></li>
+                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Allergies</span><span class="text-end">@(Model.Allergies ?? "—")</span></li>
+                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Chronic conditions</span><span class="text-end">@(Model.ChronicConditions ?? "—")</span></li>
+                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Emergency contact</span><span class="text-end">@(Model.EmergencyContactName ?? "—")</span></li>
+                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Emergency phone</span><span>@(Model.EmergencyContactPhone ?? "—")</span></li>
+            </ul></div></div>
+    </div>
+</div>
