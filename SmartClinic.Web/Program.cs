@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SmartClinic.Web.Data;
 using SmartClinic.Web.Models;
+using SmartClinic.Web.Repositories;
 using SmartClinic.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,6 +36,10 @@ builder.Services.ConfigureApplicationCookie(o =>
 builder.Services.AddScoped<IAppEmailSender, ConsoleEmailSender>(); // swap for MailKit sender in Sprint 3
 
 builder.Services.AddScoped<IDoctorSearchService, DoctorSearchService>(); // Sprint 1 #14
+
+// Sprint 1: Medicine inventory (repository + service layers).
+builder.Services.AddScoped<IMedicineRepository, MedicineRepository>();
+builder.Services.AddScoped<IMedicineInventoryService, MedicineInventoryService>();
 
 builder.Services.AddControllersWithViews();
 
