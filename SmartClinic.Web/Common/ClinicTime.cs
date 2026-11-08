@@ -2,7 +2,10 @@ using System.Globalization;
 
 namespace SmartClinic.Web.Common;
 
-
+/// <summary>
+/// The clinic works in Bangladesh time, but cloud servers usually run in UTC.
+/// Always use ClinicTime.Today / ClinicTime.Now instead of DateTime.Today / DateTime.Now.
+/// </summary>
 public static class ClinicTime
 {
     private static readonly TimeZoneInfo Zone = Resolve();
