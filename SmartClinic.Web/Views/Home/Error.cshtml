@@ -1,0 +1,7 @@
+@model string
+@{ ViewData["Title"] = "Error"; }
+<div class="container py-5 text-center">
+    <h2>Something went wrong</h2>
+    <p class="text-muted">Please try again. Reference: @Model</p>
+    <a class="btn btn-clinic" asp-controller="Home" asp-action="Index">Back to home</a>
+</div>

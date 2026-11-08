@@ -1,0 +1,13 @@
+@model IEnumerable<(string Title, string Icon, string Sprint)>
+<div class="row g-3">
+    @foreach (var m in Model)
+    {
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="module-card">
+                <i class="bi @m.Icon"></i>
+                <h6>@m.Title</h6>
+                <span class="badge badge-sprint">@m.Sprint</span>
+            </div>
+        </div>
+    }
+</div>

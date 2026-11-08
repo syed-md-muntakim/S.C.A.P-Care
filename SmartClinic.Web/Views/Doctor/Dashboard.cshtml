@@ -1,0 +1,21 @@
+@{
+    ViewData["Title"] = "Doctor Dashboard";
+    var modules = new List<(string Title, string Icon, string Sprint)>
+    {
+        ("My Schedule", "bi-calendar-week", "Sprint 1"), ("Appointments", "bi-calendar-check", "Sprint 2"),
+        ("Live Queue", "bi-people", "Sprint 2"), ("Telemedicine", "bi-camera-video", "Sprint 3"),
+        ("Patient Records (EMR)", "bi-journal-medical", "Sprint 3"), ("Lab Orders", "bi-eyedropper", "Sprint 3"),
+        ("E-Prescriptions", "bi-file-earmark-medical", "Sprint 4"), ("My Ratings", "bi-star", "Sprint 4")
+    };
+}
+<div class="container py-4">
+    <h3 class="mb-1">Doctor Dashboard</h3>
+    <p class="text-muted">Welcome, Dr. @User.Identity!.Name</p>
+    <div class="row g-3 mb-4">
+        <div class="col-md-4"><div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Today's appointments</div></div></div>
+        <div class="col-md-4"><div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Patients in queue</div></div></div>
+        <div class="col-md-4"><div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Pending lab results</div></div></div>
+    </div>
+    <h5 class="mb-3">Modules</h5>
+    <partial name="_ModuleGrid" model="modules" />
+</div>

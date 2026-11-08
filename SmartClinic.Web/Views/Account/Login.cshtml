@@ -1,0 +1,30 @@
+@model LoginViewModel
+@{ ViewData["Title"] = "Login"; }
+<div class="auth-wrap">
+    <div class="card auth-card shadow-sm">
+        <div class="card-body p-4">
+            <h3 class="mb-1">Welcome back</h3>
+            <p class="text-muted">Sign in with your User ID</p>
+            <form asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+                <div class="mb-3">
+                    <label asp-for="UserId" class="form-label"></label>
+                    <input asp-for="UserId" class="form-control" autofocus autocomplete="username" />
+                    <span asp-validation-for="UserId" class="text-danger small"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label"></label>
+                    <input asp-for="Password" class="form-control" autocomplete="current-password" />
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="form-check"><input asp-for="RememberMe" class="form-check-input" /><label asp-for="RememberMe" class="form-check-label"></label></div>
+                    <a asp-action="ForgotPassword" class="link-clinic small">Forgot password?</a>
+                </div>
+                <button type="submit" class="btn btn-clinic w-100">Login</button>
+            </form>
+            <p class="text-center mt-3 mb-0 small">New here? <a asp-action="Register" class="link-clinic">Create an account</a></p>
+        </div>
+    </div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

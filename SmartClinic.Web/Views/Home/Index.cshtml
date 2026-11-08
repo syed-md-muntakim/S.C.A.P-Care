@@ -1,0 +1,19 @@
+@{ ViewData["Title"] = "Welcome"; }
+<section class="hero text-center">
+    <div class="container py-5">
+        <i class="bi bi-hospital hero-icon"></i>
+        <h1 class="fw-bold mt-3">Smart Clinic Appointment &amp; Patient Care System</h1>
+        <p class="lead text-muted mx-auto" style="max-width:640px">Book appointments, follow your queue live, manage medical records, prescriptions, lab tests and billing in one place.</p>
+        <div class="d-flex justify-content-center gap-2 mt-4">
+            <a class="btn btn-clinic btn-lg" asp-controller="Account" asp-action="Login">Login</a>
+            <a class="btn btn-outline-clinic btn-lg" asp-controller="Account" asp-action="Register">Create an account</a>
+        </div>
+    </div>
+</section>
+<section class="container pb-5">
+    <div class="row g-3 text-center">
+        <div class="col-md-4"><div class="module-card"><i class="bi bi-shield-lock"></i><h6>Admin</h6><p class="small text-muted mb-0">Manage doctors, beds, stock, billing and analytics.</p></div></div>
+        <div class="col-md-4"><div class="module-card"><i class="bi bi-person-badge"></i><h6>Doctor</h6><p class="small text-muted mb-0">Schedule, consultations, EMR, prescriptions and lab orders.</p></div></div>
+        <div class="col-md-4"><div class="module-card"><i class="bi bi-person-heart"></i><h6>Patient</h6><p class="small text-muted mb-0">Find doctors, book visits, pay online and view records.</p></div></div>
+    </div>
+</section>

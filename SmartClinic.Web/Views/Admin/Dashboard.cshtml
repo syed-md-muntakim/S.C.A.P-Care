@@ -1,0 +1,52 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    var modules = new List<(string Title, string Icon, string Sprint)>
+    {
+        ("Doctor Schedule", "bi-calendar-week", "Sprint 1"), ("Bed / Cabin", "bi-hospital", "Sprint 1"),
+        ("Medicine Inventory", "bi-capsule", "Sprint 1"), ("Billing & Invoices", "bi-receipt", "Sprint 2"),
+        ("Reports Export", "bi-file-earmark-spreadsheet", "Sprint 2"), ("Lab Tests", "bi-eyedropper", "Sprint 3"),
+        ("Payments", "bi-credit-card", "Sprint 3"), ("Analytics", "bi-graph-up", "Sprint 4")
+    };
+}
+<div class="container py-4">
+    <h3 class="mb-1">Admin Dashboard</h3>
+    <p class="text-muted">Welcome, @User.Identity!.Name</p>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4"><div class="stat-card"><div class="stat-value">@Model.ApprovedDoctors</div><div class="stat-label">Approved doctors</div></div></div>
+        <div class="col-md-4"><div class="stat-card"><div class="stat-value">@Model.PendingDoctors.Count</div><div class="stat-label">Pending approvals</div></div></div>
+        <div class="col-md-4"><div class="stat-card"><div class="stat-value">@Model.TotalPatients</div><div class="stat-label">Registered patients</div></div></div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header fw-semibold">Doctor registration requests</div>
+        @if (!Model.PendingDoctors.Any())
+        {
+            <div class="card-body text-muted">No pending requests.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead><tr><th>User ID</th><th>Name</th><th>Specialty</th><th>Email</th><th>Phone</th><th class="text-end">Action</th></tr></thead>
+                    <tbody>
+                    @foreach (var d in Model.PendingDoctors)
+                    {
+                        <tr>
+                            <td>@d.UserName</td><td>@d.FullName</td><td>@d.Specialty</td><td>@d.Email</td><td>@d.PhoneNumber</td>
+                            <td class="text-end">
+                                <form asp-action="ApproveDoctor" asp-route-id="@d.Id" method="post" class="d-inline"><button class="btn btn-sm btn-clinic">Approve</button></form>
+                                <form asp-action="RejectDoctor" asp-route-id="@d.Id" method="post" class="d-inline" onsubmit="return confirm('Reject and remove this registration?');"><button class="btn btn-sm btn-outline-danger">Reject</button></form>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+
+    <h5 class="mb-3">Modules</h5>
+    <partial name="_ModuleGrid" model="modules" />
+</div>
