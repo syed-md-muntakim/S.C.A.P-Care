@@ -33,6 +33,9 @@ builder.Services.ConfigureApplicationCookie(o =>
 });
 
 builder.Services.AddScoped<IAppEmailSender, ConsoleEmailSender>(); // swap for MailKit sender in Sprint 3
+
+builder.Services.AddScoped<IDoctorSearchService, DoctorSearchService>(); // Sprint 1 #14
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -43,6 +46,9 @@ using (var scope = app.Services.CreateScope())
     if (app.Configuration.GetValue<bool>("Database:AutoMigrate"))
         await db.Database.MigrateAsync();
     await DbSeeder.SeedAsync(scope.ServiceProvider, app.Configuration);
+
+    if (app.Environment.IsDevelopment())
+        await DevDoctorSeeder.SeedAsync(scope.ServiceProvider); // sample doctors for testing #14
 }
 
 if (!app.Environment.IsDevelopment())
