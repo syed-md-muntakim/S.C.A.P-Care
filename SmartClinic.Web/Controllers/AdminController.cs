@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SmartClinic.Web.Common;
 using SmartClinic.Web.Models;
+using SmartClinic.Web.Services;
+
 
 namespace SmartClinic.Web.Controllers;
 
@@ -10,17 +12,34 @@ namespace SmartClinic.Web.Controllers;
 public class AdminController : Controller
 {
     private readonly UserManager<ApplicationUser> _users;
-    public AdminController(UserManager<ApplicationUser> users) => _users = users;
+    private readonly IMedicineInventoryService _medicineInventory;
+
+    public AdminController(
+        UserManager<ApplicationUser> users,
+        IMedicineInventoryService medicineInventory)
+    {
+        _users = users;
+        _medicineInventory = medicineInventory;
+    }
+
 
     public async Task<IActionResult> Dashboard()
     {
         var doctors = await _users.GetUsersInRoleAsync(Roles.Doctor);
         var patients = await _users.GetUsersInRoleAsync(Roles.Patient);
+        var inventory = await _medicineInventory.GetSummaryAsync();
+        
         return View(new AdminDashboardViewModel
         {
             ApprovedDoctors = doctors.Count(d => d.IsApproved),
             TotalPatients = patients.Count,
-            PendingDoctors = doctors.Where(d => !d.IsApproved).OrderBy(d => d.CreatedAt).ToList()
+            PendingDoctors = doctors.Where(d => !d.IsApproved).OrderBy(d => d.CreatedAt).ToList(),
+            TotalMedicines = inventory.TotalMedicines,
+            LowStockMedicines = inventory.LowStockMedicines,
+            OutOfStockMedicines = inventory.OutOfStockMedicines,
+            ExpiringSoonMedicines = inventory.ExpiringSoonMedicines,
+            ExpiredMedicines = inventory.ExpiredMedicines
+
         });
     }
 
