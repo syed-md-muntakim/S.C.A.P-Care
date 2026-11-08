@@ -1,0 +1,18 @@
+@model DoctorListItem
+@{ ViewData["Title"] = Model.DisplayName; }
+@section Styles { <link rel="stylesheet" href="~/css/doctors.css" asp-append-version="true" /> }
+
+<div class="container py-4" style="max-width:640px">
+    <a asp-action="Index" class="link-clinic small"><i class="bi bi-arrow-left"></i> Back to search</a>
+    <div class="doctor-card mt-3 p-4">
+        <div class="doctor-avatar lg">@Model.Initials</div>
+        <h3 class="mb-1">@Model.DisplayName</h3>
+        <span class="badge badge-specialty mb-3">@(Model.Specialty ?? "General")</span>
+        <p class="text-muted small mb-1">Member since @Model.MemberSince.ToString("MMM yyyy")</p>
+        <hr />
+        <div class="d-flex justify-content-center gap-2">
+            <button class="btn btn-clinic" disabled title="Available in Sprint 2"><i class="bi bi-calendar-plus"></i> Book appointment</button>
+        </div>
+        <p class="small text-muted mt-2 mb-0">Schedule, availability and ratings will appear here once those modules are merged.</p>
+    </div>
+</div>

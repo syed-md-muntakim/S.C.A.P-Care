@@ -1,0 +1,10 @@
+.doctor-card { border: 1px solid #e5e7eb; border-top: 4px solid var(--brand); border-radius: .5rem; padding: 1.25rem; background: #fff; height: 100%; text-align: center; transition: transform .15s, box-shadow .15s; }
+.doctor-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59, 7, 100, .15); }
+[data-theme="dark"] .doctor-card { background: #1d1729; border-color: #3a2d52; }
+.doctor-avatar { width: 64px; height: 64px; border-radius: 50%; background: var(--brand); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 700; margin-bottom: .75rem; }
+.doctor-avatar.lg { width: 96px; height: 96px; font-size: 2rem; }
+.badge-specialty { background: var(--brand-soft); color: var(--brand); font-weight: 600; }
+.filter-bar { border: 1px solid #e5e7eb; border-radius: .5rem; padding: 1rem; background: #fff; }
+[data-theme="dark"] .filter-bar { background: #1d1729; border-color: #3a2d52; }
+.pagination .page-link { color: var(--brand); }
+.pagination .active .page-link { background: var(--brand); border-color: var(--brand); color: #fff; }
