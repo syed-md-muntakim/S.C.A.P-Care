@@ -11,6 +11,9 @@
 <div class="container py-4">
     <h3 class="mb-1">Patient Dashboard</h3>
     <p class="text-muted">Welcome, @User.Identity!.Name</p>
+
+    <a class="btn btn-clinic mb-3" asp-controller="Doctors" asp-action="Index"><i class="bi bi-search-heart"></i> Find a Doctor</a>
+
     <div class="row g-3 mb-4">
         <div class="col-md-4"><div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Upcoming appointments</div></div></div>
         <div class="col-md-4"><div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Unpaid invoices</div></div></div>
