@@ -1,0 +1,157 @@
+@model MedicineInventoryViewModel
+@{
+    ViewData["Title"] = "Medicine Inventory";
+}
+
+<div class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h3 class="mb-1">Medicine Inventory</h3>
+            <p class="text-muted mb-0">Manage medicine batches, quantities, expiry dates and stock alerts.</p>
+        </div>
+        <a asp-action="Create" class="btn btn-clinic">
+            <i class="bi bi-plus-lg me-1"></i> Add medicine
+        </a>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg">
+            <div class="stat-card h-100">
+                <div class="stat-value">@Model.TotalMedicines</div>
+                <div class="stat-label">Medicine records</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg">
+            <div class="stat-card h-100">
+                <div class="stat-value">@Model.LowStockMedicines</div>
+                <div class="stat-label">Low stock</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg">
+            <div class="stat-card h-100">
+                <div class="stat-value">@Model.OutOfStockMedicines</div>
+                <div class="stat-label">Out of stock</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg">
+            <div class="stat-card h-100">
+                <div class="stat-value">@Model.ExpiringSoonMedicines</div>
+                <div class="stat-label">Expiring in 30 days</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg">
+            <div class="stat-card h-100">
+                <div class="stat-value">@Model.ExpiredMedicines</div>
+                <div class="stat-label">Expired</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form asp-action="Index" method="get" class="row g-2 align-items-end">
+                <div class="col-md-6">
+                    <label for="searchTerm" class="form-label">Search inventory</label>
+                    <input id="searchTerm" name="searchTerm" value="@Model.SearchTerm"
+                           class="form-control" placeholder="Medicine, generic name, strength or batch..." />
+                </div>
+                <div class="col-md-3">
+                    <label for="statusFilter" class="form-label">Stock status</label>
+                    <select id="statusFilter" name="statusFilter" class="form-select">
+                        <option value="all" selected="@(Model.StatusFilter == "all")">All medicines</option>
+                        <option value="low" selected="@(Model.StatusFilter == "low")">Low stock</option>
+                        <option value="out" selected="@(Model.StatusFilter == "out")">Out of stock</option>
+                        <option value="expiring" selected="@(Model.StatusFilter == "expiring")">Expiring soon</option>
+                        <option value="expired" selected="@(Model.StatusFilter == "expired")">Expired</option>
+                        <option value="in-stock" selected="@(Model.StatusFilter == "in-stock")">In stock</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-clinic flex-grow-1">
+                        <i class="bi bi-search me-1"></i> Filter
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-clinic">Reset</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span class="fw-semibold">Inventory records</span>
+            <span class="small text-muted">@Model.Medicines.Count result(s)</span>
+        </div>
+        @if (!Model.Medicines.Any())
+        {
+            <div class="card-body text-center py-5">
+                <i class="bi bi-capsule display-5 text-muted"></i>
+                <p class="mt-3 mb-1 fw-semibold">No medicines found</p>
+                <p class="text-muted small mb-3">Try changing your search or add a medicine to the inventory.</p>
+                <a asp-action="Create" class="btn btn-clinic btn-sm">Add medicine</a>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Medicine</th>
+                            <th>Batch</th>
+                            <th>Stock</th>
+                            <th>Reorder at</th>
+                            <th>Expiry date</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var medicine in Model.Medicines)
+                    {
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">@medicine.Name</div>
+                                <div class="small text-muted">
+                                    @medicine.GenericName
+                                    @if (!string.IsNullOrWhiteSpace(medicine.Strength))
+                                    {
+                                        <span> · @medicine.Strength</span>
+                                    }
+                                    <span> · @medicine.DosageForm</span>
+                                </div>
+                            </td>
+                            <td>@(string.IsNullOrWhiteSpace(medicine.BatchNumber) ? "—" : medicine.BatchNumber)</td>
+                            <td class="fw-semibold">@medicine.QuantityInStock @medicine.Unit</td>
+                            <td>@medicine.ReorderLevel</td>
+                            <td>@(medicine.ExpiryDate?.ToString("dd MMM yyyy") ?? "—")</td>
+                            <td><span class="badge @medicine.StatusCssClass">@medicine.StockStatus</span></td>
+                            <td class="text-end text-nowrap">
+                                <a asp-action="Details" asp-route-id="@medicine.Id"
+                                   class="btn btn-sm btn-outline-clinic" title="Details" aria-label="Details">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="AdjustStock" asp-route-id="@medicine.Id"
+                                   class="btn btn-sm btn-outline-clinic" title="Adjust stock" aria-label="Adjust stock">
+                                    <i class="bi bi-box-seam"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@medicine.Id"
+                                   class="btn btn-sm btn-outline-clinic" title="Edit" aria-label="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@medicine.Id" method="post"
+                                      class="d-inline"
+                                      onsubmit="return confirm('Remove this medicine from active inventory? Stock history will be retained.');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                            title="Remove" aria-label="Remove">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

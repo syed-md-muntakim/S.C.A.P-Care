@@ -1,0 +1,122 @@
+@model MedicineDetailsViewModel
+@{
+    ViewData["Title"] = "Medicine Details";
+    var medicine = Model.Medicine;
+}
+
+<div class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <a asp-action="Index" class="link-clinic text-decoration-none">
+                <i class="bi bi-arrow-left me-1"></i> Back to inventory
+            </a>
+            <h3 class="mt-2 mb-1">@medicine.Name</h3>
+            <p class="text-muted mb-0">
+                @medicine.GenericName
+                @if (!string.IsNullOrWhiteSpace(medicine.Strength))
+                {
+                    <span> · @medicine.Strength</span>
+                }
+                <span> · @medicine.DosageForm</span>
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="AdjustStock" asp-route-id="@medicine.Id" class="btn btn-clinic">
+                <i class="bi bi-box-seam me-1"></i> Adjust stock
+            </a>
+            <a asp-action="Edit" asp-route-id="@medicine.Id" class="btn btn-outline-clinic">
+                <i class="bi bi-pencil me-1"></i> Edit
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card h-100">
+                <div class="stat-value">@medicine.QuantityInStock</div>
+                <div class="stat-label">Current stock (@medicine.Unit)</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card h-100">
+                <div class="stat-value">@medicine.ReorderLevel</div>
+                <div class="stat-label">Reorder level</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card h-100">
+                <div class="stat-value">@medicine.UnitPrice.ToString("N2")</div>
+                <div class="stat-label">Unit price</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card h-100">
+                <div class="stat-value fs-4">@medicine.ExpiryDate?.ToString("dd MMM yyyy")</div>
+                <div class="stat-label">Expiry date</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header fw-semibold">Medicine and batch information</div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4"><div class="small text-muted">Generic name</div><div>@(medicine.GenericName ?? "—")</div></div>
+                <div class="col-md-4"><div class="small text-muted">Strength</div><div>@(medicine.Strength ?? "—")</div></div>
+                <div class="col-md-4"><div class="small text-muted">Dosage form</div><div>@medicine.DosageForm</div></div>
+                <div class="col-md-4"><div class="small text-muted">Batch number</div><div>@(medicine.BatchNumber ?? "—")</div></div>
+                <div class="col-md-4"><div class="small text-muted">Supplier</div><div>@(medicine.SupplierName ?? "—")</div></div>
+                <div class="col-md-4"><div class="small text-muted">Stock unit</div><div>@medicine.Unit</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header fw-semibold">Stock movement history</div>
+        @if (!Model.StockMovements.Any())
+        {
+            <div class="card-body text-muted">No stock movements have been recorded.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Date and time</th>
+                            <th>Movement</th>
+                            <th>Quantity</th>
+                            <th>Before</th>
+                            <th>After</th>
+                            <th>Notes</th>
+                            <th>Recorded by</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var movement in Model.StockMovements)
+                    {
+                        <tr>
+                            <td>@movement.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")</td>
+                            <td>
+                                @if (movement.MovementType == StockMovementType.StockIn)
+                                {
+                                    <span class="badge bg-success">Stock in</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Stock out</span>
+                                }
+                            </td>
+                            <td>@movement.QuantityChanged</td>
+                            <td>@movement.QuantityBefore</td>
+                            <td>@movement.QuantityAfter</td>
+                            <td>@(movement.Notes ?? "—")</td>
+                            <td>@movement.PerformedBy</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
