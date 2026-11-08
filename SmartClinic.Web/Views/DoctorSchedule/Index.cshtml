@@ -1,0 +1,131 @@
+@model ScheduleIndexViewModel
+@{
+    ViewData["Title"] = "My Schedule";
+    var dayNames = new[] { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
+    var today = ClinicTime.Today;
+}
+<div class="container py-4">
+    @if (Model.IsAdminView)
+    {
+        <a asp-controller="AdminDoctors" asp-action="Index" class="link-clinic small"><i class="bi bi-arrow-left"></i> Back to doctors</a>
+    }
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-1 mb-3">
+        <div>
+            <h3 class="mb-0">@(Model.IsAdminView ? "Schedule: " + Model.DoctorName : "My Schedule")</h3>
+            <span class="text-muted">@Model.DoctorName@(string.IsNullOrWhiteSpace(Model.Specialty) ? "" : " · " + Model.Specialty)</span>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a asp-action="Calendar" asp-route-doctorId="@Model.DoctorId" class="btn btn-outline-clinic"><i class="bi bi-calendar3"></i> Calendar view</a>
+            <a asp-action="AddLeave" asp-route-doctorId="@Model.DoctorId" class="btn btn-outline-clinic"><i class="bi bi-airplane"></i> Add leave</a>
+            <a asp-action="AddShift" asp-route-doctorId="@Model.DoctorId" class="btn btn-clinic"><i class="bi bi-plus-lg"></i> Add shift</a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header fw-semibold">Weekly shifts</div>
+        @if (!Model.Shifts.Any())
+        {
+            <div class="card-body text-muted">No shifts yet. Click <strong>Add shift</strong> to set the working days and hours. Patients can only see slots from active shifts.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead><tr><th>Day</th><th>Time</th><th>Slot</th><th>Valid from</th><th>Valid until</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+                    <tbody>
+                    @foreach (var s in Model.Shifts)
+                    {
+                        <tr>
+                            <td>@dayNames[(int)s.DayOfWeek]</td>
+                            <td>@s.StartTime.Hm() - @s.EndTime.Hm()</td>
+                            <td>@s.SlotMinutes min</td>
+                            <td>@s.ValidFrom.Pretty()</td>
+                            <td>@(s.ValidTo is { } vt ? vt.Pretty() : "No end date")</td>
+                            <td>@if (s.IsActive) { <span class="badge text-bg-success">Active</span> } else { <span class="badge text-bg-secondary">Paused</span> }</td>
+                            <td class="text-end text-nowrap">
+                                <a asp-action="EditShift" asp-route-id="@s.Id" asp-route-doctorId="@Model.DoctorId" class="btn btn-sm btn-outline-clinic">Edit</a>
+                                <form asp-action="ToggleShift" asp-route-id="@s.Id" asp-route-active="@(!s.IsActive)" asp-route-doctorId="@Model.DoctorId" method="post" class="d-inline">
+                                    <button class="btn btn-sm btn-outline-secondary">@(s.IsActive ? "Pause" : "Resume")</button>
+                                </form>
+                                <form asp-action="DeleteShift" asp-route-id="@s.Id" asp-route-doctorId="@Model.DoctorId" method="post" class="d-inline" onsubmit="return confirm('Delete this shift?');">
+                                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header fw-semibold">Leave</div>
+        @if (!Model.Leaves.Any())
+        {
+            <div class="card-body text-muted">No leave recorded.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead><tr><th>From</th><th>To</th><th>Type</th><th>Reason</th><th></th><th class="text-end">Actions</th></tr></thead>
+                    <tbody>
+                    @foreach (var l in Model.Leaves)
+                    {
+                        <tr>
+                            <td>@l.StartDate.Pretty()</td>
+                            <td>@l.EndDate.Pretty()</td>
+                            <td>@l.LeaveType</td>
+                            <td>@(l.Reason ?? "—")</td>
+                            <td>@if (l.EndDate < today) { <span class="badge text-bg-secondary">Past</span> } else if (l.StartDate <= today) { <span class="badge text-bg-warning">Ongoing</span> } else { <span class="badge badge-sprint">Upcoming</span> }</td>
+                            <td class="text-end">
+                                <form asp-action="DeleteLeave" asp-route-id="@l.Id" asp-route-doctorId="@Model.DoctorId" method="post" class="d-inline" onsubmit="return confirm('Remove this leave?');">
+                                    <button class="btn btn-sm btn-outline-danger">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+
+    <div class="card">
+        <div class="card-header fw-semibold">Check available slots on a date</div>
+        <div class="card-body">
+            <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+                <input type="date" id="slotDate" class="form-control" style="max-width:200px" value="@today.Iso()" min="@today.Iso()" />
+                <button type="button" id="slotBtn" class="btn btn-clinic">Show slots</button>
+            </div>
+            <div id="slotResult" class="text-muted">Pick a date to see the bookable slots generated from the active shifts (leave days are skipped).</div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    (function () {
+        var doctorId = '@Model.DoctorId';
+        var out = document.getElementById('slotResult');
+        function esc(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+        document.getElementById('slotBtn').addEventListener('click', function () {
+            var date = document.getElementById('slotDate').value;
+            if (!date) { out.textContent = 'Choose a date first.'; return; }
+            out.textContent = 'Loading...';
+            fetch('/Availability/Slots?doctorId=' + encodeURIComponent(doctorId) + '&date=' + date)
+                .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+                .then(function (d) {
+                    if (d.isPast) { out.innerHTML = '<span class="text-muted">That date is in the past.</span>'; return; }
+                    if (d.onLeave) { out.innerHTML = '<span class="badge text-bg-danger">On leave</span> ' + esc(d.leaveReason || ''); return; }
+                    if (!d.slots.length) { out.innerHTML = '<span class="text-muted">No slots on this date.</span>'; return; }
+                    out.innerHTML = '<div class="mb-2 fw-semibold">' + d.slots.length + ' slots</div>' + d.slots.map(function (s) {
+                        return '<span class="badge badge-sprint me-1 mb-1 p-2">' + s.start + ' - ' + s.end + '</span>';
+                    }).join('');
+                })
+                .catch(function () { out.innerHTML = '<span class="text-danger">Could not load slots.</span>'; });
+        });
+    })();
+</script>
+}

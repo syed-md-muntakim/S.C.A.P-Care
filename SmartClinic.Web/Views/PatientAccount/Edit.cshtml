@@ -1,0 +1,39 @@
+@model EditPatientAccountViewModel
+@{
+    ViewData["Title"] = "Edit Profile";
+    var genders = new SelectList(new[] { "Male", "Female", "Other" }, Model.Gender);
+    var bloodGroups = new SelectList(new[] { "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-" }, Model.BloodGroup);
+}
+<div class="container py-4" style="max-width:900px">
+    <a asp-action="Index" class="link-clinic small"><i class="bi bi-arrow-left"></i> Back to My Account</a>
+    <h3 class="mt-2 mb-3">Edit profile</h3>
+    <form asp-action="Edit" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2"></div>
+
+        <div class="card mb-3"><div class="card-header fw-semibold">Personal &amp; contact</div><div class="card-body"><div class="row g-3">
+            <div class="col-md-6"><label asp-for="FullName" class="form-label"></label><input asp-for="FullName" class="form-control" /><span asp-validation-for="FullName" class="text-danger small"></span></div>
+            <div class="col-md-6"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" /><span asp-validation-for="Email" class="text-danger small"></span></div>
+            <div class="col-md-6"><label asp-for="PhoneNumber" class="form-label"></label><input asp-for="PhoneNumber" class="form-control" /><span asp-validation-for="PhoneNumber" class="text-danger small"></span></div>
+            <div class="col-md-6"><label asp-for="DateOfBirth" class="form-label"></label>
+                <input type="date" id="DateOfBirth" name="DateOfBirth" class="form-control" value="@(Model.DateOfBirth?.Iso())" max="@ClinicTime.Today.Iso()" min="1900-01-01" />
+                <span asp-validation-for="DateOfBirth" class="text-danger small"></span></div>
+            <div class="col-md-6"><label asp-for="Gender" class="form-label"></label><select asp-for="Gender" asp-items="genders" class="form-select"><option value="">-- Select --</option></select></div>
+            <div class="col-md-6"><label asp-for="Address" class="form-label"></label><input asp-for="Address" class="form-control" /><span asp-validation-for="Address" class="text-danger small"></span></div>
+        </div></div></div>
+
+        <div class="card mb-3"><div class="card-header fw-semibold">Medical information</div><div class="card-body"><div class="row g-3">
+            <div class="col-md-4"><label asp-for="BloodGroup" class="form-label"></label><select asp-for="BloodGroup" asp-items="bloodGroups" class="form-select"><option value="">-- Select --</option></select></div>
+            <div class="col-md-8"><label asp-for="Allergies" class="form-label"></label><textarea asp-for="Allergies" class="form-control" rows="2" placeholder="e.g. Penicillin, peanuts"></textarea><span asp-validation-for="Allergies" class="text-danger small"></span></div>
+            <div class="col-12"><label asp-for="ChronicConditions" class="form-label"></label><textarea asp-for="ChronicConditions" class="form-control" rows="2" placeholder="e.g. Diabetes, hypertension"></textarea><span asp-validation-for="ChronicConditions" class="text-danger small"></span></div>
+        </div></div></div>
+
+        <div class="card mb-3"><div class="card-header fw-semibold">Emergency contact</div><div class="card-body"><div class="row g-3">
+            <div class="col-md-6"><label asp-for="EmergencyContactName" class="form-label"></label><input asp-for="EmergencyContactName" class="form-control" /></div>
+            <div class="col-md-6"><label asp-for="EmergencyContactPhone" class="form-label"></label><input asp-for="EmergencyContactPhone" class="form-control" /><span asp-validation-for="EmergencyContactPhone" class="text-danger small"></span></div>
+        </div></div></div>
+
+        <button type="submit" class="btn btn-clinic">Save changes</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

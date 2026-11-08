@@ -1,0 +1,44 @@
+@model IReadOnlyList<DoctorListItem>
+@{ ViewData["Title"] = "Manage Doctors"; }
+@section Styles { <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.min.css" /> }
+<div class="container py-4">
+    <h3 class="mb-1">Doctors &amp; schedules</h3>
+    <p class="text-muted">Manage each doctor’s weekly shifts and leave. New registrations are approved on the <a asp-controller="Admin" asp-action="Dashboard" class="link-clinic">Admin Dashboard</a>.</p>
+    <div class="card"><div class="card-body">
+        <table id="doctorsTable" class="table align-middle w-100">
+            <thead><tr><th>User ID</th><th>Name</th><th>Specialty</th><th>Contact</th><th>Active shifts</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+            @foreach (var d in Model)
+            {
+                <tr>
+                    <td>@d.UserName</td>
+                    <td>@d.FullName</td>
+                    <td>@d.Specialty</td>
+                    <td>@d.Email<br /><span class="small text-muted">@d.Phone</span></td>
+                    <td>@d.ActiveShifts</td>
+                    <td>
+                        @if (!d.IsApproved) { <span class="badge text-bg-warning">Pending approval</span> }
+                        else if (!d.IsActive) { <span class="badge text-bg-secondary">Deactivated</span> }
+                        else { <span class="badge text-bg-success">Active</span> }
+                    </td>
+                    <td class="text-nowrap">
+                        @if (d.IsApproved)
+                        {
+                            <a asp-controller="DoctorSchedule" asp-action="Index" asp-route-doctorId="@d.UserId" class="btn btn-sm btn-clinic">Schedule</a>
+                            <form asp-action="SetActive" asp-route-id="@d.UserId" asp-route-active="@(!d.IsActive)" method="post" class="d-inline"
+                                  onsubmit="return confirm('@(d.IsActive ? "Deactivate" : "Activate") this doctor?');">
+                                <button class="btn btn-sm @(d.IsActive ? "btn-outline-danger" : "btn-outline-success")">@(d.IsActive ? "Deactivate" : "Activate")</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div></div>
+</div>
+@section Scripts {
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.min.js"></script>
+    <script>new DataTable('#doctorsTable', { order: [[1, 'asc']], pageLength: 10, columnDefs: [{ orderable: false, targets: -1 }] });</script>
+}

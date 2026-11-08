@@ -1,0 +1,42 @@
+@model ShiftFormViewModel
+@{
+    var editing = Model.Id.HasValue;
+    ViewData["Title"] = editing ? "Edit Shift" : "Add Shift";
+    var days = new[] { (1, "Mon"), (2, "Tue"), (3, "Wed"), (4, "Thu"), (5, "Fri"), (6, "Sat"), (0, "Sun") };
+}
+<div class="container py-4" style="max-width:720px">
+    <a asp-action="Index" asp-route-doctorId="@Model.DoctorId" class="link-clinic small"><i class="bi bi-arrow-left"></i> Back to schedule</a>
+    <h3 class="mt-2 mb-1">@ViewData["Title"]</h3>
+    <p class="text-muted">@Model.DoctorName</p>
+
+    <form asp-action="@(editing ? "EditShift" : "AddShift")" method="post">
+        <div asp-validation-summary="All" class="alert alert-danger py-2"></div>
+        <input type="hidden" name="DoctorId" value="@Model.DoctorId" />
+        @if (editing) { <input type="hidden" name="Id" value="@Model.Id" /> }
+
+        <div class="card mb-3"><div class="card-body">
+            <label class="form-label fw-semibold">@(editing ? "Day of week" : "Days of week")</label>
+            <div class="d-flex flex-wrap gap-3 mb-3">
+                @foreach (var (value, label) in days)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="@(editing ? "radio" : "checkbox")" name="Days" id="day@(value)" value="@value" @(Model.Days.Contains(value) ? "checked" : null) />
+                        <label class="form-check-label" for="day@(value)">@label</label>
+                    </div>
+                }
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-4"><label class="form-label">Start time</label><input type="time" name="StartTime" class="form-control" value="@Model.StartTime.Hm()" required /></div>
+                <div class="col-md-4"><label class="form-label">End time</label><input type="time" name="EndTime" class="form-control" value="@Model.EndTime.Hm()" required /></div>
+                <div class="col-md-4"><label class="form-label">Slot length (minutes)</label><input type="number" name="SlotMinutes" class="form-control" min="5" max="120" step="5" value="@Model.SlotMinutes" required /></div>
+                <div class="col-md-6"><label class="form-label">Valid from</label><input type="date" name="ValidFrom" class="form-control" value="@Model.ValidFrom.Iso()" required /></div>
+                <div class="col-md-6"><label class="form-label">Valid until <span class="text-muted">(optional)</span></label><input type="date" name="ValidTo" class="form-control" value="@(Model.ValidTo?.Iso())" /></div>
+            </div>
+            <div class="form-text mt-2">The shift repeats every selected weekday between the two dates. Leave "Valid until" empty for an open-ended shift. For a one-off extra shift, set both dates to the same day.</div>
+        </div></div>
+
+        <button type="submit" class="btn btn-clinic">@(editing ? "Save changes" : "Add shift")</button>
+        <a asp-action="Index" asp-route-doctorId="@Model.DoctorId" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+</div>

@@ -1,0 +1,48 @@
+@model PatientAccountViewModel
+@{ ViewData["Title"] = "My Account"; }
+<div class="container py-4" style="max-width:900px">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <div>
+            <h3 class="mb-0">My Account</h3>
+            <span class="text-muted">Patient ID: <strong>@Model.PatientCode</strong> &middot; User ID: @Model.UserName</span>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Edit" class="btn btn-clinic"><i class="bi bi-pencil-square"></i> Edit profile</a>
+            <a asp-action="ChangePassword" class="btn btn-outline-clinic"><i class="bi bi-key"></i> Change password</a>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="card h-100"><div class="card-header fw-semibold">Personal &amp; contact</div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Full name</span><span>@Model.FullName</span></li>
+                    <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Email</span><span>@Model.Email</span></li>
+                    <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Phone</span><span>@Model.PhoneNumber</span></li>
+                    <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Date of birth</span><span>@(Model.DateOfBirth is { } d ? d.Pretty() + " (" + Model.Age + " yrs)" : "—")</span></li>
+                    <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Gender</span><span>@(Model.Gender ?? "—")</span></li>
+                    <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Address</span><span class="text-end">@(Model.Address ?? "—")</span></li>
+                    <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Member since</span><span>@Model.MemberSince.ToString("dd MMM yyyy")</span></li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100"><div class="card-header fw-semibold">Medical &amp; emergency</div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Blood group</span><span>@(Model.BloodGroup ?? "—")</span></li>
+                    <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Allergies</span><span class="text-end">@(Model.Allergies ?? "—")</span></li>
+                    <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Chronic conditions</span><span class="text-end">@(Model.ChronicConditions ?? "—")</span></li>
+                    <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Emergency contact</span><span class="text-end">@(Model.EmergencyContactName ?? "—")</span></li>
+                    <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Emergency phone</span><span>@(Model.EmergencyContactPhone ?? "—")</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-danger mt-4">
+        <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div><strong>Deactivate account</strong><div class="small text-muted">You will be signed out and cannot log in until an administrator reactivates your account.</div></div>
+            <a asp-action="Deactivate" class="btn btn-outline-danger">Deactivate…</a>
+        </div>
+    </div>
+</div>
