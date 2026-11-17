@@ -8,7 +8,7 @@ namespace SmartClinic.Web.Services;
 public interface IDoctorSearchService
 {
     Task<DoctorSearchResult> SearchAsync(DoctorSearchQuery query);
-    Task<DoctorListItem?> GetAsync(string id);
+    Task<DoctorSearchItem?> GetAsync(string id);
 }
 
 public class DoctorSearchService : IDoctorSearchService
@@ -61,7 +61,7 @@ public class DoctorSearchService : IDoctorSearchService
         var page = Math.Clamp(q.Page, 1, totalPages);
 
         var items = await doctors.Skip((page - 1) * PageSize).Take(PageSize)
-            .Select(d => new DoctorListItem { Id = d.Id, FullName = d.FullName, Specialty = d.Specialty, MemberSince = d.CreatedAt })
+            .Select(d => new DoctorSearchItem { Id = d.Id, FullName = d.FullName, Specialty = d.Specialty, MemberSince = d.CreatedAt })
             .ToListAsync();
 
         return new DoctorSearchResult
@@ -71,8 +71,8 @@ public class DoctorSearchService : IDoctorSearchService
         };
     }
 
-    public Task<DoctorListItem?> GetAsync(string id) =>
+    public Task<DoctorSearchItem?> GetAsync(string id) =>
         ApprovedDoctors().Where(d => d.Id == id)
-            .Select(d => new DoctorListItem { Id = d.Id, FullName = d.FullName, Specialty = d.Specialty, MemberSince = d.CreatedAt })
+            .Select(d => new DoctorSearchItem { Id = d.Id, FullName = d.FullName, Specialty = d.Specialty, MemberSince = d.CreatedAt })
             .FirstOrDefaultAsync();
 }
