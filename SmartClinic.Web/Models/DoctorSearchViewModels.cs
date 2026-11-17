@@ -9,7 +9,7 @@ public class DoctorSearchQuery
     // Hooks for later: public int? MinRating (Sprint 4 #15), public DateOnly? AvailableOn (Sprint 1 #1)
 }
 
-public class DoctorListItem
+public class DoctorSearchItem
 {
     public string Id { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
@@ -25,7 +25,7 @@ public class DoctorListItem
 public class DoctorSearchResult
 {
     public DoctorSearchQuery Query { get; set; } = new();
-    public List<DoctorListItem> Items { get; set; } = new();
+    public List<DoctorSearchItem> Items { get; set; } = new();
     public List<string> Specialties { get; set; } = new();
     public int Page { get; set; }
     public int TotalPages { get; set; }
