@@ -4,6 +4,7 @@ using SmartClinic.Web.Data;
 using SmartClinic.Web.Models;
 using SmartClinic.Web.Repositories;
 using SmartClinic.Web.Services;
+using SmartClinic.Web.Services.Foundation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +41,9 @@ builder.Services.AddScoped<IDoctorSearchService, DoctorSearchService>(); // Spri
 // Sprint 1: Medicine inventory (repository + service layers).
 builder.Services.AddScoped<IMedicineRepository, MedicineRepository>();
 builder.Services.AddScoped<IMedicineInventoryService, MedicineInventoryService>();
+
+// Sprint 1: schedules, patient accounts, admin doctor/patient management.
+builder.Services.AddFoundationFeatures();
 
 builder.Services.AddControllersWithViews();
 
