@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SmartClinic.Web.Data.Foundation;
 using SmartClinic.Web.Models;
+using SmartClinic.Web.Models.Foundation;
 
 namespace SmartClinic.Web.Data;
 
@@ -10,6 +12,11 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 
         public DbSet<Medicine> Medicines => Set<Medicine>();
     public DbSet<MedicineStockMovement> MedicineStockMovements => Set<MedicineStockMovement>();
+
+    // Sprint 1 Foundation (schedules + patient accounts)
+    public DbSet<DoctorShift> DoctorShifts => Set<DoctorShift>();
+    public DbSet<DoctorLeave> DoctorLeaves => Set<DoctorLeave>();
+    public DbSet<PatientProfile> PatientProfiles => Set<PatientProfile>();
 
     // Other sprint entities will be added by their respective feature branches.
 
@@ -39,6 +46,9 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
             .HasForeignKey(m => m.MedicineId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.ApplyConfiguration(new PatientProfileConfiguration());
+        builder.ApplyConfiguration(new DoctorShiftConfiguration());
+        builder.ApplyConfiguration(new DoctorLeaveConfiguration());
     }
 
     public override int SaveChanges() { Stamp(); return base.SaveChanges(); }
