@@ -18,7 +18,7 @@ Git and a GitHub account.
 
 Run instructions - 
 
-Open folder in VS code, then open Termminal
+Open folder in VS code, then open Terminal
 
 # Commands on terminal
 
@@ -44,6 +44,7 @@ dotnet ef database update
 
 dotnet run
 
+# Open http://localhost:5080/ in your browser...
 
 # Quick test after it runs
 
