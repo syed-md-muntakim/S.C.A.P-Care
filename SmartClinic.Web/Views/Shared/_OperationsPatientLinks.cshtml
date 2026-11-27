@@ -1,0 +1,8 @@
+@* Sprint 2 #2, #4: entry points on the Patient dashboard *@
+<h5 class="mb-3">Appointments &amp; queue</h5>
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-lg-3"><a asp-controller="Appointments" asp-action="Book" class="module-card d-block text-decoration-none text-reset"><i class="bi bi-calendar-plus"></i><h6>Book Appointment</h6><span class="badge badge-sprint">Pick a free slot</span></a></div>
+    <div class="col-6 col-md-4 col-lg-3"><a asp-controller="Appointments" asp-action="Index" class="module-card d-block text-decoration-none text-reset"><i class="bi bi-calendar-check"></i><h6>My Appointments</h6><span class="badge badge-sprint">Upcoming &amp; past</span></a></div>
+    <div class="col-6 col-md-4 col-lg-3"><a asp-controller="Queue" asp-action="MyToken" class="module-card d-block text-decoration-none text-reset"><i class="bi bi-ticket-perforated"></i><h6>My Token</h6><span class="badge badge-sprint">Live position</span></a></div>
+    <div class="col-6 col-md-4 col-lg-3"><a asp-controller="Queue" asp-action="Board" class="module-card d-block text-decoration-none text-reset"><i class="bi bi-display"></i><h6>Live Board</h6><span class="badge badge-sprint">Now serving</span></a></div>
+</div>

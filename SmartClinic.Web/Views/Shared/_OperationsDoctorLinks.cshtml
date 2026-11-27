@@ -1,0 +1,7 @@
+@* Sprint 1 #20 / Sprint 2 #2, #4: entry points on the Doctor dashboard *@
+<h5 class="mb-3">Appointments &amp; queue</h5>
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-lg-3"><a asp-controller="Appointments" asp-action="Index" asp-route-Scope="today" class="module-card d-block text-decoration-none text-reset"><i class="bi bi-calendar-check"></i><h6>My Appointments</h6><span class="badge badge-sprint">Today &amp; upcoming</span></a></div>
+    <div class="col-6 col-md-4 col-lg-3"><a asp-controller="Queue" asp-action="Index" class="module-card d-block text-decoration-none text-reset"><i class="bi bi-people"></i><h6>Live Queue</h6><span class="badge badge-sprint">Call patients</span></a></div>
+    <div class="col-6 col-md-4 col-lg-3"><a asp-controller="Beds" asp-action="Index" class="module-card d-block text-decoration-none text-reset"><i class="bi bi-hospital"></i><h6>Bed Availability</h6><span class="badge badge-sprint">View only</span></a></div>
+</div>

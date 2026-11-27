@@ -1,0 +1,22 @@
+@inject SmartClinic.Web.Services.IBedService Beds
+@inject SmartClinic.Web.Services.IAppointmentService Appointments
+@inject SmartClinic.Web.Services.IQueueService QueueSvc
+@{
+    var bed = await Beds.GetSummaryAsync();
+    var today = await Appointments.CountTodayAsync();
+    var waiting = await QueueSvc.CountWaitingTodayAsync();
+}
+@* Sprint 1 #20 / Sprint 2 #2, #4: operations entry points on the Admin dashboard *@
+<h5 class="mb-3">Clinic operations</h5>
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3"><div class="stat-card h-100"><div class="stat-value">@(bed.AvailableBeds + bed.AvailableCabins)</div><div class="stat-label">Beds &amp; cabins available</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card h-100"><div class="stat-value">@today</div><div class="stat-label">Appointments today</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card h-100"><div class="stat-value">@waiting</div><div class="stat-label">Patients waiting</div></div></div>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-lg-3"><a asp-controller="Beds" asp-action="Index" class="module-card d-block text-decoration-none text-reset"><i class="bi bi-hospital"></i><h6>Beds &amp; Cabins</h6><span class="badge badge-sprint">Availability</span></a></div>
+    <div class="col-6 col-md-4 col-lg-3"><a asp-controller="Appointments" asp-action="Index" class="module-card d-block text-decoration-none text-reset"><i class="bi bi-calendar-check"></i><h6>Appointments</h6><span class="badge badge-sprint">All bookings</span></a></div>
+    <div class="col-6 col-md-4 col-lg-3"><a asp-controller="Appointments" asp-action="Book" class="module-card d-block text-decoration-none text-reset"><i class="bi bi-calendar-plus"></i><h6>Book for a patient</h6><span class="badge badge-sprint">Front desk</span></a></div>
+    <div class="col-6 col-md-4 col-lg-3"><a asp-controller="Queue" asp-action="Index" class="module-card d-block text-decoration-none text-reset"><i class="bi bi-ticket-perforated"></i><h6>Queue &amp; Tokens</h6><span class="badge badge-sprint">Check-in</span></a></div>
+    <div class="col-6 col-md-4 col-lg-3"><a asp-controller="Queue" asp-action="Board" class="module-card d-block text-decoration-none text-reset"><i class="bi bi-display"></i><h6>Live Board</h6><span class="badge badge-sprint">Waiting room</span></a></div>
+</div>

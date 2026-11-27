@@ -1,0 +1,18 @@
+/* Sprint 1 #20 / Sprint 2 #2, #4: beds, booking, queue */
+.slot-box { display: flex; flex-wrap: wrap; gap: .5rem; min-height: 44px; align-items: center; }
+.slot-btn { border: 1px solid var(--brand); background: transparent; color: var(--brand); border-radius: .4rem; padding: .35rem .75rem; font-size: .9rem; }
+.slot-btn:hover:not(:disabled) { background: var(--brand-soft); }
+.slot-btn.active { background: var(--brand); color: #fff; }
+.slot-btn.booked, .slot-btn:disabled { border-color: #d1d5db; color: #9ca3af; text-decoration: line-through; cursor: not-allowed; }
+[data-theme="dark"] .slot-btn { color: #d8b4fe; border-color: #d8b4fe; }
+[data-theme="dark"] .slot-btn.active { background: #7c3aed; color: #fff; }
+
+.token-chip { display: inline-block; background: var(--brand); color: #fff; border-radius: .4rem; padding: .1rem .55rem; font-weight: 700; }
+.serving-card, .board-card { border: 1px solid #e5e7eb; border-left: 5px solid var(--brand); border-radius: .5rem; padding: 1.25rem; background: #fff; }
+[data-theme="dark"] .serving-card, [data-theme="dark"] .board-card { background: #1d1729; border-color: #3a2d52; }
+.serving-number { font-size: 3rem; font-weight: 800; line-height: 1.1; color: var(--brand); }
+[data-theme="dark"] .serving-number { color: #d8b4fe; }
+
+.live-badge { font-size: .85rem; color: #6b7280; }
+.live-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #9ca3af; margin-right: .25rem; }
+#liveRegion[data-live="on"] .live-dot { background: #16a34a; box-shadow: 0 0 0 3px rgba(22, 163, 74, .25); }
