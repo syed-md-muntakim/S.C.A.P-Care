@@ -1,0 +1,124 @@
+@model BedIndexViewModel
+@{
+    ViewData["Title"] = "Bed & Cabin Availability";
+    var s = Model.Summary;
+}
+@functions {
+    static string StatusClass(BedStatus st) => st switch
+    {
+        BedStatus.Available => "bg-success",
+        BedStatus.Occupied => "bg-danger",
+        _ => "bg-warning text-dark"
+    };
+}
+<div class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h3 class="mb-1">Bed &amp; Cabin Availability</h3>
+            <p class="text-muted mb-0">@(Model.CanManage ? "Check availability, admit and discharge patients, and manage beds." : "Live availability of beds and cabins.")</p>
+        </div>
+        @if (Model.CanManage)
+        {
+            <a asp-action="Create" class="btn btn-clinic"><i class="bi bi-plus-lg me-1"></i> Add bed / cabin</a>
+        }
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg"><div class="stat-card h-100"><div class="stat-value">@s.AvailableBeds<small class="fs-6 text-muted"> / @s.TotalBeds</small></div><div class="stat-label">Beds available</div></div></div>
+        <div class="col-6 col-lg"><div class="stat-card h-100"><div class="stat-value">@s.AvailableCabins<small class="fs-6 text-muted"> / @s.TotalCabins</small></div><div class="stat-label">Cabins available</div></div></div>
+        <div class="col-6 col-lg"><div class="stat-card h-100"><div class="stat-value">@s.Occupied</div><div class="stat-label">Occupied</div></div></div>
+        <div class="col-6 col-lg"><div class="stat-card h-100"><div class="stat-value">@s.Maintenance</div><div class="stat-label">Under maintenance</div></div></div>
+    </div>
+
+    <div class="card mb-4"><div class="card-body">
+        <form asp-action="Index" method="get" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label" for="fq">Search</label>
+                <input id="fq" name="Q" value="@Model.Filter.Q" class="form-control" placeholder="Number or ward" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label" for="ftype">Type</label>
+                <select id="ftype" name="Type" class="form-select">
+                    <option value="">All</option>
+                    <option value="Bed" selected="@(Model.Filter.Type == BedType.Bed)">Bed</option>
+                    <option value="Cabin" selected="@(Model.Filter.Type == BedType.Cabin)">Cabin</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" for="fstatus">Status</label>
+                <select id="fstatus" name="Status" class="form-select">
+                    <option value="">All</option>
+                    <option value="Available" selected="@(Model.Filter.Status == BedStatus.Available)">Available</option>
+                    <option value="Occupied" selected="@(Model.Filter.Status == BedStatus.Occupied)">Occupied</option>
+                    <option value="Maintenance" selected="@(Model.Filter.Status == BedStatus.Maintenance)">Maintenance</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label" for="fward">Ward</label>
+                <select id="fward" name="Ward" class="form-select">
+                    <option value="">All</option>
+                    @foreach (var w in Model.Wards) { <option value="@w" selected="@(w == Model.Filter.Ward)">@w</option> }
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button class="btn btn-clinic flex-fill" type="submit">Filter</button>
+                <a asp-action="Index" class="btn btn-outline-clinic flex-fill">Reset</a>
+            </div>
+        </form>
+    </div></div>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead><tr><th>Number</th><th>Type</th><th>Ward</th><th class="text-end">Rate / day</th><th>Status</th><th>Patient</th>@if (Model.CanManage) { <th class="text-end">Actions</th> }</tr></thead>
+                <tbody>
+                @if (!Model.Items.Any())
+                {
+                    <tr><td colspan="7" class="text-center text-muted py-4">No beds or cabins match your filter.</td></tr>
+                }
+                @foreach (var b in Model.Items)
+                {
+                    <tr>
+                        <td><strong>@b.BedNumber</strong>@if (!string.IsNullOrEmpty(b.Notes)) { <div class="small text-muted">@b.Notes</div> }</td>
+                        <td><i class="bi @(b.Type == BedType.Cabin ? "bi-door-open" : "bi-hospital")"></i> @b.Type</td>
+                        <td>@b.Ward</td>
+                        <td class="text-end">@b.DailyRate.ToString("N0")</td>
+                        <td><span class="badge @StatusClass(b.Status)">@b.Status</span></td>
+                        <td>
+                            @if (b.PatientName is not null)
+                            {
+                                <div>@b.PatientName</div>
+                                <div class="small text-muted">since @b.AdmittedAt?.ToString("dd MMM, HH:mm")</div>
+                            }
+                            else { <span class="text-muted">-</span> }
+                        </td>
+                        @if (Model.CanManage)
+                        {
+                            <td class="text-end text-nowrap">
+                                @if (b.Status == BedStatus.Available)
+                                {
+                                    <a asp-action="Assign" asp-route-id="@b.Id" class="btn btn-sm btn-clinic">Admit</a>
+                                    <form asp-action="Maintenance" asp-route-id="@b.Id" asp-route-maintenance="true" method="post" class="d-inline"><button class="btn btn-sm btn-outline-secondary" title="Mark under maintenance"><i class="bi bi-wrench"></i></button></form>
+                                }
+                                else if (b.Status == BedStatus.Occupied)
+                                {
+                                    <form asp-action="Discharge" asp-route-id="@b.Id" method="post" class="d-inline" onsubmit="return confirm('Discharge @b.PatientName from @b.BedNumber?');"><button class="btn btn-sm btn-outline-clinic">Discharge</button></form>
+                                }
+                                else
+                                {
+                                    <form asp-action="Maintenance" asp-route-id="@b.Id" asp-route-maintenance="false" method="post" class="d-inline"><button class="btn btn-sm btn-clinic">Mark available</button></form>
+                                }
+                                <a asp-action="Edit" asp-route-id="@b.Id" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="bi bi-pencil"></i></a>
+                                @if (b.Status != BedStatus.Occupied)
+                                {
+                                    <form asp-action="Delete" asp-route-id="@b.Id" method="post" class="d-inline" onsubmit="return confirm('Remove @b.BedNumber?');"><button class="btn btn-sm btn-outline-danger" title="Remove"><i class="bi bi-trash"></i></button></form>
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

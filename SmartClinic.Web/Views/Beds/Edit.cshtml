@@ -1,0 +1,7 @@
+@model BedFormViewModel
+@{ ViewData["Title"] = "Edit Bed / Cabin"; }
+<div class="container py-4" style="max-width:720px">
+    <h3 class="mb-3">Edit @Model.BedNumber</h3>
+    <div class="card"><div class="card-body"><partial name="_BedForm" model="Model" /></div></div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

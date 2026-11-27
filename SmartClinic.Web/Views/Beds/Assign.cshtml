@@ -1,0 +1,29 @@
+@model AssignBedViewModel
+@{ ViewData["Title"] = "Admit Patient"; }
+<div class="container py-4" style="max-width:640px">
+    <a asp-action="Index" class="link-clinic small"><i class="bi bi-arrow-left"></i> Back to beds</a>
+    <h3 class="mt-2 mb-1">Admit patient to @Model.BedNumber</h3>
+    <p class="text-muted">@Model.Type &middot; @Model.Ward</p>
+    <div class="card"><div class="card-body">
+        <form asp-action="Assign" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+            <input type="hidden" asp-for="BedId" />
+            <input type="hidden" asp-for="BedNumber" /><input type="hidden" asp-for="Ward" /><input type="hidden" asp-for="Type" />
+            <div class="mb-3">
+                <label asp-for="PatientId" class="form-label"></label>
+                <select asp-for="PatientId" asp-items="Model.Patients" class="form-select">
+                    <option value="">-- Select patient --</option>
+                </select>
+                <span asp-validation-for="PatientId" class="text-danger small"></span>
+                @if (!Model.Patients.Any()) { <div class="form-text">No eligible patients: every active patient already has a bed.</div> }
+            </div>
+            <div class="mb-3">
+                <label asp-for="Notes" class="form-label">Admission note (optional)</label>
+                <input asp-for="Notes" class="form-control" />
+            </div>
+            <button type="submit" class="btn btn-clinic">Admit patient</button>
+            <a asp-action="Index" class="btn btn-outline-clinic ms-2">Cancel</a>
+        </form>
+    </div></div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
