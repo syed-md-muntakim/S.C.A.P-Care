@@ -1,5 +1,8 @@
+@using System.Security.Claims
+@inject SmartClinic.Web.Services.IAppointmentService Appointments
 @{
     ViewData["Title"] = "Patient Dashboard";
+    var upcoming = await Appointments.CountUpcomingForPatientAsync(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
     var modules = new List<(string Title, string Icon, string Sprint)>
     {
         ("My Account", "bi-person-gear", "Sprint 1"), ("Find a Doctor", "bi-search-heart", "Sprint 1"),
@@ -15,10 +18,11 @@
     <a class="btn btn-clinic mb-3" asp-controller="Doctors" asp-action="Index"><i class="bi bi-search-heart"></i> Find a Doctor</a>
 
     <div class="row g-3 mb-4">
-        <div class="col-md-4"><div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Upcoming appointments</div></div></div>
+        <div class="col-md-4"><div class="stat-card"><div class="stat-value">@upcoming</div><div class="stat-label">Upcoming appointments</div></div></div>
         <div class="col-md-4"><div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Unpaid invoices</div></div></div>
         <div class="col-md-4"><div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Prescriptions</div></div></div>
     </div>
+    <partial name="_OperationsPatientLinks" />
     <partial name="_FoundationPatientLinks" />
 
     <h5 class="mb-3">Modules</h5>
