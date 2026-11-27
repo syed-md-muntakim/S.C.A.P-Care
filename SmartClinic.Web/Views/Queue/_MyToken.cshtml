@@ -1,0 +1,64 @@
+@model MyQueueViewModel
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="text-muted small">@Model.Date</div>
+    <div class="live-badge"><span class="live-dot"></span> Live &middot; updated @Model.UpdatedAt</div>
+</div>
+
+@if (!Model.Rows.Any())
+{
+    <div class="card card-body text-center text-muted py-5">
+        <i class="bi bi-calendar-x" style="font-size:2rem"></i>
+        <p class="mt-2 mb-3">You have no appointment today.</p>
+        <div><a asp-controller="Appointments" asp-action="Book" class="btn btn-clinic">Book an appointment</a></div>
+    </div>
+}
+@foreach (var r in Model.Rows)
+{
+    <div class="card mb-3"><div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between gap-3">
+            <div>
+                <h5 class="mb-0">@r.DoctorName</h5>
+                <div class="text-muted small">@r.Specialty &middot; appointment at @r.AppointmentTime</div>
+            </div>
+            @if (r.TokenNumber is { } n)
+            {
+                <div class="text-center">
+                    <div class="small text-uppercase text-muted">Your token</div>
+                    <div class="serving-number">#@n</div>
+                </div>
+            }
+        </div>
+        <hr />
+        @if (r.TokenNumber is null)
+        {
+            <p class="mb-2">You have not checked in yet. Get your token when you arrive at the clinic.</p>
+            @if (r.CanCheckIn)
+            {
+                <form asp-controller="Queue" asp-action="Issue" method="post">
+                    <input type="hidden" name="appointmentId" value="@r.AppointmentId" />
+                    <button class="btn btn-clinic"><i class="bi bi-ticket-perforated"></i> Get my token</button>
+                </form>
+            }
+        }
+        else if (r.Status == TokenStatus.InConsultation)
+        {
+            <div class="alert alert-success mb-0"><strong>It's your turn!</strong> Please go to the doctor's room.</div>
+        }
+        else if (r.Status == TokenStatus.Completed)
+        {
+            <div class="alert alert-secondary mb-0">Your consultation is complete. Thank you!</div>
+        }
+        else if (r.Status == TokenStatus.Skipped)
+        {
+            <div class="alert alert-warning mb-0">Your token was skipped. Please meet the reception desk.</div>
+        }
+        else
+        {
+            <div class="row text-center g-3">
+                <div class="col-4"><div class="stat-value">@(r.NowServing is { } ns ? "#" + ns : "-")</div><div class="stat-label">Now serving</div></div>
+                <div class="col-4"><div class="stat-value">@r.PeopleAhead</div><div class="stat-label">People ahead</div></div>
+                <div class="col-4"><div class="stat-value">~@r.EstimatedWaitMinutes<small class="fs-6"> min</small></div><div class="stat-label">Estimated wait</div></div>
+            </div>
+        }
+    </div></div>
+}

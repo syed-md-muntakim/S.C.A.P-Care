@@ -1,0 +1,116 @@
+@model DoctorQueueViewModel
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <div>
+        <h4 class="mb-0">@Model.DoctorName</h4>
+        <div class="text-muted small">@Model.Specialty &middot; @Model.Date</div>
+    </div>
+    <div class="live-badge"><span class="live-dot"></span> Live &middot; updated @Model.UpdatedAt</div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-lg-5">
+        <div class="serving-card h-100">
+            <div class="small text-uppercase text-muted">Now serving</div>
+            @if (Model.NowServing is { } cur)
+            {
+                <div class="serving-number">#@cur.TokenNumber</div>
+                <div class="fw-semibold">@cur.PatientName</div>
+                <div class="small text-muted mb-3">Called at @cur.CalledAt &middot; appointment @cur.AppointmentTime</div>
+                @if (Model.CanControl)
+                {
+                    <div class="d-flex gap-2">
+                        <form asp-controller="Queue" asp-action="Complete" asp-route-id="@cur.TokenId" method="post"><button class="btn btn-clinic"><i class="bi bi-check2-circle"></i> Complete</button></form>
+                        <form asp-controller="Queue" asp-action="Skip" asp-route-id="@cur.TokenId" method="post"><button class="btn btn-outline-secondary">Skip</button></form>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="serving-number text-muted">-</div>
+                <div class="text-muted mb-3">No patient in consultation.</div>
+                @if (Model.CanControl)
+                {
+                    <form asp-controller="Queue" asp-action="CallNext" method="post">
+                        <button class="btn btn-clinic" disabled="@(!Model.Waiting.Any())"><i class="bi bi-megaphone"></i> Call next patient</button>
+                    </form>
+                }
+            }
+            @if (Model.CanControl && Model.NowServing is not null)
+            {
+                <div class="form-text mt-2">Complete or skip this patient to call the next one.</div>
+            }
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="card h-100">
+            <div class="card-header fw-semibold">Waiting (@Model.Waiting.Count)</div>
+            @if (!Model.Waiting.Any()) { <div class="card-body text-muted">Nobody is waiting.</div> }
+            else
+            {
+                <div class="table-responsive"><table class="table table-sm align-middle mb-0">
+                    <thead><tr><th>Token</th><th>Patient</th><th>Slot</th><th>Issued</th>@if (Model.CanControl) { <th></th> }</tr></thead>
+                    <tbody>
+                    @foreach (var w in Model.Waiting)
+                    {
+                        <tr>
+                            <td><span class="token-chip">#@w.TokenNumber</span></td><td>@w.PatientName</td><td>@w.AppointmentTime</td><td>@w.IssuedAt</td>
+                            @if (Model.CanControl)
+                            {
+                                <td class="text-end"><form asp-controller="Queue" asp-action="Skip" asp-route-id="@w.TokenId" method="post" class="d-inline"><button class="btn btn-sm btn-outline-secondary">Skip</button></form></td>
+                            }
+                        </tr>
+                    }
+                    </tbody>
+                </table></div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header fw-semibold">Booked today, not checked in (@Model.AwaitingCheckIn.Count)</div>
+    @if (!Model.AwaitingCheckIn.Any()) { <div class="card-body text-muted">Everyone with a booking today has a token.</div> }
+    else
+    {
+        <div class="table-responsive"><table class="table table-sm align-middle mb-0">
+            <thead><tr><th>Slot</th><th>Patient</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var a in Model.AwaitingCheckIn)
+            {
+                <tr>
+                    <td>@a.AppointmentTime</td><td>@a.PatientName</td>
+                    <td class="text-end">
+                        <form asp-controller="Queue" asp-action="Issue" method="post" class="d-inline">
+                            <input type="hidden" name="appointmentId" value="@a.AppointmentId" /><input type="hidden" name="doctorId" value="@Model.DoctorId" />
+                            <button class="btn btn-sm btn-clinic"><i class="bi bi-ticket-perforated"></i> Issue token</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table></div>
+    }
+</div>
+
+@if (Model.Skipped.Any())
+{
+    <div class="card mb-4">
+        <div class="card-header fw-semibold">Skipped (@Model.Skipped.Count)</div>
+        <div class="table-responsive"><table class="table table-sm align-middle mb-0"><tbody>
+            @foreach (var k in Model.Skipped)
+            {
+                <tr>
+                    <td><span class="token-chip">#@k.TokenNumber</span></td><td>@k.PatientName</td>
+                    <td class="text-end">
+                        @if (Model.CanControl)
+                        {
+                            <form asp-controller="Queue" asp-action="Requeue" asp-route-id="@k.TokenId" method="post" class="d-inline"><button class="btn btn-sm btn-outline-clinic">Return to queue</button></form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody></table></div>
+    </div>
+}
+
+<div class="small text-muted">Completed today: <strong>@Model.Completed.Count</strong></div>

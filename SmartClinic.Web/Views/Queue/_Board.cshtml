@@ -1,0 +1,29 @@
+@model BoardViewModel
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="text-muted small">@Model.Date</div>
+    <div class="live-badge"><span class="live-dot"></span> Live &middot; updated @Model.UpdatedAt</div>
+</div>
+@if (!Model.Rows.Any())
+{
+    <div class="card card-body text-center text-muted py-5">No appointments today.</div>
+}
+<div class="row g-3">
+    @foreach (var r in Model.Rows)
+    {
+        <div class="col-md-6 col-xl-4">
+            <div class="board-card h-100">
+                <div class="fw-semibold">@r.DoctorName</div>
+                <div class="small text-muted mb-2">@r.Specialty</div>
+                <div class="small text-uppercase text-muted">Now serving</div>
+                <div class="serving-number">@(r.NowServing is { } n ? "#" + n : "-")</div>
+                <div class="small text-muted mb-1">Next in line</div>
+                <div class="mb-2">
+                    @if (!r.Waiting.Any()) { <span class="text-muted">-</span> }
+                    @foreach (var w in r.Waiting.Take(5)) { <span class="token-chip me-1">#@w</span> }
+                    @if (r.Waiting.Count > 5) { <span class="small text-muted">+@(r.Waiting.Count - 5) more</span> }
+                </div>
+                <div class="small text-muted">@r.Waiting.Count waiting &middot; @r.CompletedCount done &middot; @r.AppointmentsToday booked today</div>
+            </div>
+        </div>
+    }
+</div>

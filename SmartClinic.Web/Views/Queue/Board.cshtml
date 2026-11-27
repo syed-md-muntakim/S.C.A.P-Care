@@ -1,0 +1,10 @@
+@model BoardViewModel
+@{ ViewData["Title"] = "Live Queue Board"; }
+<div class="container py-4">
+    <h3 class="mb-1">Live queue board</h3>
+    <p class="text-muted">Token numbers only. No patient details are shown here.</p>
+    <div id="liveRegion" data-refresh-url="@Url.Action("BoardPartial", "Queue")">
+        <partial name="_Board" model="Model" />
+    </div>
+</div>
+@section Scripts { <partial name="_LiveScripts" /> }

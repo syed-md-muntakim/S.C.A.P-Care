@@ -1,0 +1,33 @@
+@model QueueIndexViewModel
+@{ ViewData["Title"] = "Queue & Tokens"; }
+<div class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+        <div>
+            <h3 class="mb-1">Queue &amp; Tokens</h3>
+            <p class="text-muted mb-0">@(Model.IsAdmin ? "Check patients in and watch each doctor's live queue." : "Call patients in token order. The queue updates live.")</p>
+        </div>
+        <a asp-action="Board" class="btn btn-outline-clinic"><i class="bi bi-display"></i> Live board</a>
+    </div>
+
+    @if (Model.IsAdmin)
+    {
+        <form asp-action="Index" method="get" class="mb-3" style="max-width:420px">
+            <label class="form-label" for="doctorPick">Doctor</label>
+            <select id="doctorPick" name="doctorId" class="form-select" onchange="this.form.submit()">
+                @foreach (var d in Model.Doctors) { <option value="@d.Value" selected="@(d.Value == Model.SelectedDoctorId)">@d.Text</option> }
+            </select>
+        </form>
+    }
+
+    @if (Model.Queue is null)
+    {
+        <div class="alert alert-info">No doctor selected.</div>
+    }
+    else
+    {
+        <div id="liveRegion" data-refresh-url="@Url.Action("ConsolePartial", "Queue", new { doctorId = Model.SelectedDoctorId })">
+            <partial name="_Console" model="Model.Queue" />
+        </div>
+    }
+</div>
+@section Scripts { <partial name="_LiveScripts" /> }

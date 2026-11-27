@@ -1,0 +1,86 @@
+@model AppointmentIndexViewModel
+@{
+    ViewData["Title"] = Model.Role == Roles.Patient ? "My Appointments" : "Appointments";
+    var scope = Model.Query.Scope ?? "upcoming";
+    string Tab(string key) => scope == key ? "btn btn-clinic btn-sm" : "btn btn-outline-clinic btn-sm";
+}
+@functions {
+    static string StatusClass(AppointmentStatus s) => s switch
+    {
+        AppointmentStatus.Booked => "bg-primary",
+        AppointmentStatus.Completed => "bg-success",
+        AppointmentStatus.Cancelled => "bg-secondary",
+        _ => "bg-warning text-dark"
+    };
+}
+<div class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+        <div>
+            <h3 class="mb-1">@ViewData["Title"]</h3>
+            <p class="text-muted mb-0">@(Model.Role == Roles.Admin ? "All clinic appointments." : Model.Role == Roles.Doctor ? "Your patients' appointments." : "Your booked visits.")</p>
+        </div>
+        @if (Model.Role != Roles.Doctor)
+        {
+            <a asp-action="Book" class="btn btn-clinic"><i class="bi bi-calendar-plus me-1"></i> Book appointment</a>
+        }
+    </div>
+
+    <div class="card card-body mb-3">
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+            <div class="d-flex gap-1 flex-wrap">
+                @foreach (var (key, label) in new[] { ("upcoming", "Upcoming"), ("today", "Today"), ("past", "Past"), ("all", "All") })
+                {
+                    <a asp-action="Index" asp-route-Scope="@key" asp-route-DoctorId="@Model.Query.DoctorId" asp-route-Status="@Model.Query.Status" class="@Tab(key)">@label</a>
+                }
+            </div>
+            <form asp-action="Index" method="get" class="d-flex gap-2 flex-wrap ms-md-auto">
+                <input type="hidden" name="Scope" value="@scope" />
+                @if (Model.Role == Roles.Admin)
+                {
+                    <select name="DoctorId" class="form-select form-select-sm" style="min-width:220px" onchange="this.form.submit()">
+                        <option value="">All doctors</option>
+                        @foreach (var d in Model.Doctors) { <option value="@d.Value" selected="@(d.Value == Model.Query.DoctorId)">@d.Text</option> }
+                    </select>
+                }
+                <select name="Status" class="form-select form-select-sm" style="min-width:150px" onchange="this.form.submit()">
+                    <option value="">Any status</option>
+                    @foreach (var st in Enum.GetValues<AppointmentStatus>())
+                    {
+                        <option value="@st" selected="@(Model.Query.Status == st)">@st</option>
+                    }
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <div class="card"><div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead><tr><th>Date</th><th>Time</th>@if (Model.Role != Roles.Doctor) { <th>Doctor</th> }@if (Model.Role != Roles.Patient) { <th>Patient</th> }<th>Reason</th><th>Status</th><th>Token</th></tr></thead>
+            <tbody>
+            @if (!Model.Items.Any()) { <tr><td colspan="7" class="text-center text-muted py-4">No appointments found.</td></tr> }
+            @foreach (var a in Model.Items)
+            {
+                <tr>
+                    <td>@a.Date.Pretty()</td>
+                    <td>@a.Start.Hm() - @a.End.Hm()</td>
+                    @if (Model.Role != Roles.Doctor) { <td>@a.DoctorName<div class="small text-muted">@a.Specialty</div></td> }
+                    @if (Model.Role != Roles.Patient) { <td>@a.PatientName</td> }
+                    <td class="small">@(a.Reason ?? "-")</td>
+                    <td><span class="badge @StatusClass(a.Status)">@a.Status</span></td>
+                    <td>
+                        @if (a.TokenNumber is { } n) { <span class="token-chip">#@n</span> <span class="small text-muted">@a.TokenStatus</span> }
+                        else if (a.CanGetToken)
+                        {
+                            <form asp-controller="Queue" asp-action="Issue" method="post" class="d-inline">
+                                <input type="hidden" name="appointmentId" value="@a.Id" /><input type="hidden" name="doctorId" value="@a.DoctorId" />
+                                <button class="btn btn-sm btn-clinic">@(Model.Role == Roles.Patient ? "Check in" : "Issue token")</button>
+                            </form>
+                        }
+                        else { <span class="text-muted">-</span> }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div></div>
+</div>
