@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SmartClinic.Web.Data;
+using SmartClinic.Web.Hubs;
 using SmartClinic.Web.Models;
 using SmartClinic.Web.Repositories;
 using SmartClinic.Web.Services;
@@ -45,6 +46,9 @@ builder.Services.AddScoped<IMedicineInventoryService, MedicineInventoryService>(
 // Sprint 1: schedules, patient accounts, admin doctor/patient management.
 builder.Services.AddFoundationFeatures();
 
+// Sprint 1 #20 Bed & Cabin, Sprint 2 #2 Appointment Booking, #4 Queue and Token (adds SignalR too).
+builder.Services.AddClinicOperations();
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -57,7 +61,10 @@ using (var scope = app.Services.CreateScope())
     await DbSeeder.SeedAsync(scope.ServiceProvider, app.Configuration);
 
     if (app.Environment.IsDevelopment())
+    {
         await DevDoctorSeeder.SeedAsync(scope.ServiceProvider); // sample doctors for testing #14
+        await DevBedSeeder.SeedAsync(scope.ServiceProvider);    // sample beds & cabins for testing #20
+    }
 }
 
 if (!app.Environment.IsDevelopment())
@@ -73,5 +80,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapHub<QueueHub>("/hubs/queue");
 
 app.Run();
