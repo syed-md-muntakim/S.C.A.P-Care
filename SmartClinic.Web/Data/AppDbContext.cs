@@ -18,6 +18,12 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<DoctorLeave> DoctorLeaves => Set<DoctorLeave>();
     public DbSet<PatientProfile> PatientProfiles => Set<PatientProfile>();
 
+    // Sprint 1 #20 Bed & Cabin, Sprint 2 #2 Appointment Booking, #4 Queue and Token
+    public DbSet<Bed> Beds => Set<Bed>();
+    public DbSet<BedAssignment> BedAssignments => Set<BedAssignment>();
+    public DbSet<Appointment> Appointments => Set<Appointment>();
+    public DbSet<QueueToken> QueueTokens => Set<QueueToken>();
+
     // Other sprint entities will be added by their respective feature branches.
 
     // Sprint 1: DbSet<DoctorShift>, DbSet<Bed>, DbSet<Medicine> ...
@@ -49,6 +55,11 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
         builder.ApplyConfiguration(new PatientProfileConfiguration());
         builder.ApplyConfiguration(new DoctorShiftConfiguration());
         builder.ApplyConfiguration(new DoctorLeaveConfiguration());
+
+        builder.ApplyConfiguration(new BedConfiguration());
+        builder.ApplyConfiguration(new BedAssignmentConfiguration());
+        builder.ApplyConfiguration(new AppointmentConfiguration());
+        builder.ApplyConfiguration(new QueueTokenConfiguration());
     }
 
     public override int SaveChanges() { Stamp(); return base.SaveChanges(); }
