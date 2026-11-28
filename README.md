@@ -40,6 +40,8 @@ dotnet ef migrations add InitialCreate
 
 dotnet ef migrations add FoundationSprint1
 
+dotnet ef migrations add Sprint2Operations
+
 dotnet ef database update
 
 dotnet run
